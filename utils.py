@@ -40,13 +40,22 @@ def get_arguments():
     return parser.parse_args()
 
 
-def prepare_psql_command(db_name, table_name, user, output_path, delimiter):
+def prepare_psql_command(db_name, table_name, user, output_path, delimiter,
+                         schema, pwd):
     output_path = f"{os.path.join(output_path, table_name)}.csv"
-    base_sql = f"COPY {table_name} TO '{output_path}' (" \
-               f"DELIMITER '{delimiter}')"
+    if schema:
+        base_sql = f"\COPY {schema}.{table_name} TO '{output_path}' (" \
+                   f"DELIMITER '{delimiter}')"
+    else:
+        base_sql = f"\COPY {table_name} TO '{output_path}' (" \
+                   f"DELIMITER '{delimiter}')"
 
-    command = f"sudo -u {user} psql postgres -w -d " \
-              f"{db_name} -c \"{base_sql}\""
+    if pwd:
+        command = f"PGPASSWORD={pwd} sudo -u {user} psql {user} -w -d " \
+                  f"{db_name} -c \"{base_sql}\""
+    else:
+        command = f"sudo -u {user} psql {user} -w -d " \
+                  f"{db_name} -c \"{base_sql}\""
     return command, output_path
 
 

@@ -6,6 +6,9 @@ directory_name = ""  # default directory where to upload
 
 # db_login
 user = ""
+pwd = ""
+database = ""
+schema = ""
 
 # misc
 log_dir = ""

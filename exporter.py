@@ -56,18 +56,24 @@ if __name__ == '__main__':
                 t,
                 cfg.user,
                 cfg.output_dir,
-                delimiter=','
+                ',',
+                cfg.schema,
+                cfg.pwd
             )
         except Exception as e:
             general_logger.exception(e)
             general_logger.error(f"Could not pre-process table: {t}")
         else:
             cmds.append((command, t))
-            if os.path.isfile(output_path):
-                output_file_paths.append(output_path)
+            output_file_paths.append(output_path)
 
     asyncio.run(utils.main_export(cmds, cfg.num_workers))
 
+    to_upload = []
+    for path in output_file_paths:
+        if os.path.isfile(path):
+            to_upload.append(path)
+
     # Upload files
     lh.upload_files(cfg.storage_account_name, cfg.storage_account_key,
-                    args.filesystem, args.dir, output_file_paths)
+                    args.filesystem, args.dir, to_upload)

@@ -30,8 +30,8 @@ def upload_files(storage_account_name: str,
             try:
                 if os.path.isfile(file):
                     with directory_client.create_file(tail) as file_client:
-                        with open(file) as f:
-                            file_client.upload_data(f.read(), overwrite=True)
+                        with open(file, 'rb') as f:
+                            file_client.upload_data(f, overwrite=True)
                 else:
                     raise FileNotFoundError(f"File: {file} was not found.")
             except FileNotFoundError as e:
