@@ -36,6 +36,10 @@ def upload_files(storage_account_name: str,
                     raise FileNotFoundError(f"File: {file} was not found.")
             except FileNotFoundError as e:
                 general_logger.exception(e)
-                file_logger.error(f"File: {file} was not processed")
+                file_logger.error(f"File: {file} was not uploaded,"
+                                  f"because it doesn't exist.")
+            except Exception as e:
+                general_logger.exception(e)
+                file_logger.error(f"File: {file} was not uploaded.")
             else:
-                file_logger.info(f"File: {file} processed")
+                file_logger.info(f"File: {file} uploaded.")

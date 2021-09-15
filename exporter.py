@@ -5,32 +5,27 @@ import shutil
 import logging
 import asyncio
 
-try:
-    import config_local as cfg
-except ImportError:
-    raise ImportError("Please create config_local.py file based on "
-                      "config.py file.")
 
 if __name__ == '__main__':
     # Read arguments
     args = utils.get_arguments()
 
     # Start logging
-    if os.path.isdir(cfg.log_dir):
-        utils.set_up_loggers(cfg.log_dir)
+    if os.path.isdir(args.log_dir):
+        utils.set_up_loggers(args.log_dir)
     else:
         try:
-            os.makedirs(cfg.log_dir)
-            utils.set_up_loggers(cfg.log_dir)
+            os.makedirs(args.log_dir)
+            utils.set_up_loggers(args.log_dir)
         except Exception as e:
-            raise RuntimeError(f"Could not create dir {cfg.log_dir}")
+            raise RuntimeError(f"Could not create dir {args.log_dir}")
     general_logger = logging.getLogger('general_logger')
     file_logger = logging.getLogger('file_logger')
 
     # Delete files inside output path if exists, else try to create output path
-    if os.path.isdir(cfg.output_dir):
-        for filename in os.listdir(cfg.output_dir):
-            file_path = os.path.join(cfg.output_dir, filename)
+    if os.path.isdir(args.output_dir):
+        for filename in os.listdir(args.output_dir):
+            file_path = os.path.join(args.output_dir, filename)
             try:
                 if os.path.isfile(file_path) or os.path.islink(file_path):
                     os.unlink(file_path)
@@ -41,9 +36,9 @@ if __name__ == '__main__':
                                   f"{file_path}")
     else:
         try:
-            os.makedirs(cfg.output_dir)
+            os.makedirs(args.output_dir)
         except Exception as e:
-            raise RuntimeError(f"Could not create output dir {cfg.output_dir}")
+            raise RuntimeError(f"Could not create output dir {args.output_dir}")
 
     # Generate CSVs
     cmds = []
@@ -52,28 +47,22 @@ if __name__ == '__main__':
     for t in args.table:
         try:
             command, output_path = utils.prepare_psql_command(
-                cfg.database,
+                args.database,
                 t,
-                cfg.user,
-                cfg.output_dir,
+                args.db_user,
+                args.output_dir,
                 ',',
-                cfg.schema,
-                cfg.pwd
+                args.schema,
+                args.db_pwd
             )
         except Exception as e:
             general_logger.exception(e)
             general_logger.error(f"Could not pre-process table: {t}")
         else:
-            cmds.append((command, t))
-            output_file_paths.append(output_path)
+            cmds.append((command, output_path, t))
 
-    asyncio.run(utils.main_export(cmds, cfg.num_workers))
-
-    to_upload = []
-    for path in output_file_paths:
-        if os.path.isfile(path):
-            to_upload.append(path)
+    asyncio.run(utils.main_export(cmds, args.num_workers))
 
     # Upload files
-    lh.upload_files(cfg.storage_account_name, cfg.storage_account_key,
-                    args.filesystem, args.dir, to_upload)
+    lh.upload_files(args.account_name, args.account_key,
+                    args.filesystem, args.dir, utils.EXPORTED_FILES)

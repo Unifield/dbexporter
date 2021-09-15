@@ -1,3 +1,7 @@
+"""
+When you add some new config option,
+please add it in utils.get_arguments().
+"""
 # data_lake_storage
 storage_account_name = ""
 storage_account_key = ""
