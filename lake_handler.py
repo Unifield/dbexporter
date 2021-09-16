@@ -1,45 +1,48 @@
 import azure.storage.filedatalake as lake
-import logging
 import os
 
 
-def upload_files(storage_account_name: str,
-                 storage_account_key: str,
-                 file_system_name: str,
-                 directory_name: str,
-                 files_to_upload: list) -> None:
+class DataLake:
 
-    general_logger = logging.getLogger('general_logger')
-    file_logger = logging.getLogger('file_logger')
-    try:
+    def __init__(self, storage_account_name, storage_account_key):
+        self.storage_account_name = storage_account_name
+        self.storage_account_key = storage_account_key
+        self.service_client = self._set_service_client()
+
+        self.file_system_client = None
+        self.directory_client = None
+
+    def _set_service_client(self):
         service_client = lake.DataLakeServiceClient(
             account_url="{}://{}.dfs.core.windows.net".format(
-                "https", storage_account_name),
-            credential=storage_account_key)
-        file_system_client = service_client.get_file_system_client(
-            file_system_name)
-        directory_client = file_system_client.create_directory(directory_name)
-    except Exception as e:
-        general_logger.exception(e)
-        msg = f"Could not connect to account: {storage_account_name}."
-        general_logger.debug(msg)
-        raise RuntimeError(msg)
-    else:
-        for file in files_to_upload:
-            head, tail = os.path.split(file)
-            try:
-                if os.path.isfile(file):
-                    with directory_client.create_file(tail) as file_client:
-                        with open(file, 'rb') as f:
-                            file_client.upload_data(f, overwrite=True)
-                else:
-                    raise FileNotFoundError(f"File: {file} was not found.")
-            except FileNotFoundError as e:
-                general_logger.exception(e)
-                file_logger.error(f"File: {file} was not uploaded,"
-                                  f"because it doesn't exist.")
-            except Exception as e:
-                general_logger.exception(e)
-                file_logger.error(f"File: {file} was not uploaded.")
+                "https", self.storage_account_name),
+            credential=self.storage_account_key)
+        return service_client
+
+    def set_file_system_client(self, filesystem_name):
+        self.file_system_client = self.service_client.get_file_system_client(
+            filesystem_name)
+
+    def set_directory_client(self, dir_name):
+        self.directory_client = self.file_system_client.\
+            create_directory(dir_name)
+
+    def upload_file(self, file, *loggers):
+        general_logger, file_logger = loggers
+        head, tail = os.path.split(file)
+        try:
+            if os.path.isfile(file):
+                with self.directory_client.create_file(tail) as file_client:
+                    with open(file, 'rb') as f:
+                        file_client.upload_data(f, overwrite=True)
             else:
-                file_logger.info(f"File: {file} uploaded.")
+                raise FileNotFoundError(f"File: {file} was not found.")
+        except FileNotFoundError as e:
+            general_logger.exception(e)
+            file_logger.error(f"File: {file} was not uploaded,"
+                              f"because it doesn't exist.")
+        except Exception as e:
+            general_logger.exception(e)
+            file_logger.error(f"File: {file} was not uploaded.")
+        else:
+            file_logger.info(f"File: {file} uploaded.")

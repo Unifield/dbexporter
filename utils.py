@@ -11,8 +11,6 @@ except ImportError:
     raise ImportError("Please create config_local.py file based on "
                       "config.py file.")
 
-EXPORTED_FILES = []
-
 
 def set_up_loggers(root_path):
     timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
@@ -104,11 +102,10 @@ def prepare_psql_command(db_name, table_name, user, output_path, delimiter,
 
 
 async def export_csv(arg):
-    global EXPORTED_FILES
     general_logger = logging.getLogger('general_logger')
     file_logger = logging.getLogger('file_logger')
 
-    cmd, output_path, table_name = arg
+    cmd, output_path, table_name, dl = arg
     proc = await asyncio.create_subprocess_shell(
         cmd,
         stdout=asyncio.subprocess.PIPE,
@@ -120,7 +117,8 @@ async def export_csv(arg):
     if stdout:
         general_logger.info(f'[stdout]\n{stdout.decode()}')
         file_logger.info(f"Table: {table_name} was processed.")
-        EXPORTED_FILES.append(output_path)
+        dl.upload_file(output_path, general_logger, file_logger)
+
     if stderr:
         general_logger.error(f'[stderr]\n{stderr.decode()}')
         file_logger.error(f"Table: {table_name} was not processed.")

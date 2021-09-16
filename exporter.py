@@ -40,6 +40,16 @@ if __name__ == '__main__':
         except Exception as e:
             raise RuntimeError(f"Could not create output dir {args.output_dir}")
 
+    # Create DataLake services
+    try:
+        dl = lh.DataLake(args.account_name, args.account_key)
+        dl.set_file_system_client(args.filesystem)
+        dl.set_directory_client(args.dir)
+    except Exception as e:
+        general_logger.exception(e)
+        general_logger.error(f"Could create DataLake service")
+        exit()
+
     # Generate CSVs
     cmds = []
     output_file_paths = []
@@ -59,10 +69,7 @@ if __name__ == '__main__':
             general_logger.exception(e)
             general_logger.error(f"Could not pre-process table: {t}")
         else:
-            cmds.append((command, output_path, t))
+            cmds.append((command, output_path, t, dl))
 
+    # Run export and upload
     asyncio.run(utils.main_export(cmds, args.num_workers))
-
-    # Upload files
-    lh.upload_files(args.account_name, args.account_key,
-                    args.filesystem, args.dir, utils.EXPORTED_FILES)
