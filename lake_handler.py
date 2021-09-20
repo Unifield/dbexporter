@@ -32,3 +32,8 @@ class DataLake:
         with self.directory_client.create_file(tail) as file_client:
             with open(file, 'rb') as f:
                 file_client.upload_data(f, overwrite=True)
+
+    def close(self):
+        self.directory_client.close()
+        self.file_system_client.close()
+        self.service_client.close()

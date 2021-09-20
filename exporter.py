@@ -52,7 +52,6 @@ if __name__ == '__main__':
 
     # Generate CSVs
     cmds = []
-    output_file_paths = []
 
     for t in args.table:
         try:
@@ -90,3 +89,9 @@ if __name__ == '__main__':
             file_logger.error(f"File: {file} was not uploaded.")
         else:
             file_logger.info(f"File: {file} uploaded.")
+
+    # Close services
+    try:
+        dl.close()
+    except Exception as e:
+        general_logger.exception(e)
