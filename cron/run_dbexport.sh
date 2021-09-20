@@ -53,5 +53,8 @@ python3.9 -m virtualenv "$VENV"
 . "$VENV/bin/activate"
 python3.9 -m pip install -r "$DBEXPORTER/requirements.txt"
 
+# Export Python path
+export PYTHONPATH="${PYTHONPATH}:$DBEXPORTER"
+
 # Run exporter
-python3.9 exporter.py "$@"
+python3.9 db_exporter/exporter.py "$@"
