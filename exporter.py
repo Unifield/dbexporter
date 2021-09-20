@@ -69,7 +69,24 @@ if __name__ == '__main__':
             general_logger.exception(e)
             general_logger.error(f"Could not pre-process table: {t}")
         else:
-            cmds.append((command, output_path, t, dl))
+            cmds.append((command, output_path, t))
 
     # Run export and upload
     asyncio.run(utils.main_export(cmds, args.num_workers))
+
+    # Upload files
+    for file in utils.EXPORTED_FILES:
+        try:
+            if os.path.isfile(file):
+                dl.upload_file(file)
+            else:
+                raise FileNotFoundError(f"File: {file} was not found.")
+        except FileNotFoundError as e:
+            general_logger.exception(e)
+            file_logger.error(f"File: {file} was not uploaded, "
+                              f"because it doesn't exist.")
+        except Exception as e:
+            general_logger.exception(e)
+            file_logger.error(f"File: {file} was not uploaded.")
+        else:
+            file_logger.info(f"File: {file} uploaded.")

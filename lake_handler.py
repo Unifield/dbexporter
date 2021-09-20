@@ -27,22 +27,8 @@ class DataLake:
         self.directory_client = self.file_system_client.\
             create_directory(dir_name)
 
-    def upload_file(self, file, *loggers):
-        general_logger, file_logger = loggers
+    def upload_file(self, file):
         head, tail = os.path.split(file)
-        try:
-            if os.path.isfile(file):
-                with self.directory_client.create_file(tail) as file_client:
-                    with open(file, 'rb') as f:
-                        file_client.upload_data(f, overwrite=True)
-            else:
-                raise FileNotFoundError(f"File: {file} was not found.")
-        except FileNotFoundError as e:
-            general_logger.exception(e)
-            file_logger.error(f"File: {file} was not uploaded,"
-                              f"because it doesn't exist.")
-        except Exception as e:
-            general_logger.exception(e)
-            file_logger.error(f"File: {file} was not uploaded.")
-        else:
-            file_logger.info(f"File: {file} uploaded.")
+        with self.directory_client.create_file(tail) as file_client:
+            with open(file, 'rb') as f:
+                file_client.upload_data(f, overwrite=True)
