@@ -126,16 +126,23 @@ async def export_csv(arg):
         general_logger.info(f'[stdout]\n{stdout.decode()}')
         file_logger.info(f"Table: {table_name} was processed.")
         EXPORTED_FILES.append(output_path)
+
     if stderr:
         general_logger.error(f'[stderr]\n{stderr.decode()}')
         file_logger.error(f"Table: {table_name} was not processed.")
 
 
 async def export_worker(q):
+    general_logger = logging.getLogger('general_logger')
+
     while True:
-        code = await q.get()
-        await export_csv(code)
-        q.task_done()
+        try:
+            code = await q.get()
+            await export_csv(code)
+            q.task_done()
+        except Exception as e:
+            general_logger.exception(e)
+            q.task_done()
 
 
 async def main_export(cmds, n_workers):
