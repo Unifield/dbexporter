@@ -10,7 +10,7 @@ except ImportError:
 
 
 def create_export_cmd(table_name, db_name, output_dir):
-    output_path = os.path.join(output_dir, f"{db_name}.sql")
+    output_path = os.path.join(output_dir, f"{table_name}.sql")
     cmd = f"pg_dump -t 'ufdb.{table_name}' --schema-only --no-owner " \
           f"{db_name} > {output_path}"
     return cmd, output_path
