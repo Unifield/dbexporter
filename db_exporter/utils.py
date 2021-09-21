@@ -11,8 +11,6 @@ except ImportError:
     raise ImportError("Please create config_local.py file based on "
                       "config.py file.")
 
-EXPORTED_FILES = []
-
 
 def set_up_loggers(root_path):
     timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
@@ -109,7 +107,6 @@ def prepare_psql_command(db_name, table_name, user, output_path, delimiter,
 
 
 async def export_csv(arg):
-    global EXPORTED_FILES
     general_logger = logging.getLogger('general_logger')
     file_logger = logging.getLogger('file_logger')
 
@@ -125,29 +122,32 @@ async def export_csv(arg):
     if stdout:
         general_logger.info(f'[stdout]\n{stdout.decode()}')
         file_logger.info(f"Table: {table_name} was processed.")
-        EXPORTED_FILES.append(output_path)
+        return output_path
 
     if stderr:
         general_logger.error(f'[stderr]\n{stderr.decode()}')
         file_logger.error(f"Table: {table_name} was not processed.")
 
 
-async def export_worker(q):
+async def export_worker(q, output):
     general_logger = logging.getLogger('general_logger')
 
     while True:
         try:
             code = await q.get()
-            await export_csv(code)
-            q.task_done()
+            res = await export_csv(code)
+            if res:
+                output.append(res)
         except Exception as e:
             general_logger.exception(e)
+        finally:
             q.task_done()
 
 
 async def main_export(cmds, n_workers):
     q = asyncio.Queue()
-    workers = [asyncio.create_task(export_worker(q)) for _ in
+    output = list()
+    workers = [asyncio.create_task(export_worker(q, output)) for _ in
                range(n_workers)]
 
     for cmd in cmds:
@@ -157,3 +157,4 @@ async def main_export(cmds, n_workers):
     for worker in workers:
         worker.cancel()
     await asyncio.gather(*workers, return_exceptions=True)
+    return output

@@ -71,10 +71,10 @@ if __name__ == '__main__':
             cmds.append((command, output_path, t))
 
     # Run export and upload
-    asyncio.run(utils.main_export(cmds, args.num_workers))
+    output_files = asyncio.run(utils.main_export(cmds, args.num_workers))
 
     # Upload files
-    for file in utils.EXPORTED_FILES:
+    for file in output_files:
         try:
             if os.path.isfile(file):
                 dl.upload_file(file)
