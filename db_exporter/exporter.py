@@ -48,7 +48,7 @@ if __name__ == '__main__':
     except Exception as e:
         general_logger.exception(e)
         general_logger.error(f"Could create DataLake service")
-        exit()
+        raise RuntimeError(f"Could create DataLake service")
 
     # Generate CSVs
     cmds = []
