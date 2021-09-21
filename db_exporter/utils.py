@@ -45,7 +45,7 @@ def set_up_loggers(root_path):
     file_processing_logger.addHandler(output_handler)
 
 
-def get_arguments():
+def get_arguments(parser_type='basic'):
     """
     Allows all config settings to be provided via cmd as arguments.
     :return: Arguments provided via cmd
@@ -81,6 +81,11 @@ def get_arguments():
     parser.add_argument('-t', '--table', nargs='+',
                         default=cfg.table_list, action='store')
 
+    if parser_type == 'schema':
+        parser.add_argument('-so', '--schema-output-dir', type=str,
+                            default='/home/dbexporter/dbexporter/'
+                                    'schema_exporter/output',
+                            action='store')
     return parser.parse_args()
 
 
