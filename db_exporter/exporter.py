@@ -90,6 +90,12 @@ if __name__ == '__main__':
         else:
             file_logger.info(f"File: {file} uploaded.")
 
+    # Set proper ACL for directory and files inside
+    try:
+        dl.set_acl(args.di, acl=args.acl, owner=args.owner, group=args.group)
+    except Exception as e:
+        general_logger.exception(e)
+
     # Close services
     try:
         dl.close()
