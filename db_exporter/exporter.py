@@ -92,7 +92,7 @@ if __name__ == '__main__':
 
     # Set proper ACL for directory and files inside
     try:
-        dl.set_acl(args.di, acl=args.acl, owner=args.owner, group=args.group)
+        dl.set_acl(args.dir, acl=args.acl, owner=args.owner, group=args.group)
     except Exception as e:
         general_logger.exception(e)
 
