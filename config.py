@@ -19,3 +19,8 @@ log_dir = ""
 output_dir = ""
 num_workers = 8  # number of async workers
 table_list = []
+
+# acl
+owner = ""
+group = ""
+acl = ""

@@ -33,6 +33,16 @@ class DataLake:
             with open(file, 'rb') as f:
                 file_client.upload_data(f, overwrite=True)
 
+    def set_acl(self, directory, **kwargs):
+        self.directory_client.set_access_control(**kwargs)
+        for path in self.file_system_client.get_paths():
+            if not path.is_directory:
+                d, f = os.path.split(path.name)
+                if d == directory:
+                    self.directory_client.get_file_client(f).set_access_control(
+                        **kwargs
+                    )
+
     def close(self):
         self.directory_client.close()
         self.file_system_client.close()

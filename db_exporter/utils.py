@@ -78,6 +78,13 @@ def get_arguments(parser_type='basic'):
                         default=cfg.num_workers, action='store')
     parser.add_argument('-t', '--table', nargs='+',
                         default=cfg.table_list, action='store')
+    # ACL settings
+    parser.add_argument('-o', '--owner', type=str,
+                        default=cfg.owner, action='store')
+    parser.add_argument('-g', '--group', type=str,
+                        default=cfg.group, action='store')
+    parser.add_argument('-acl', '--acl', type=str,
+                        default=cfg.acl, action='store')
 
     if parser_type == 'schema':
         parser.add_argument('-so', '--schema-output-dir', type=str,
