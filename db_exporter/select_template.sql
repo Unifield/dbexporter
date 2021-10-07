@@ -1,6 +1,6 @@
 SELECT
     {%- for column in columns %}
-    {{ column }}::TEXT,
+    {{ column }}::TEXT{{ "," if not loop.last else "" }}
     {%- endfor %}
 FROM
     {%- if schema %}
