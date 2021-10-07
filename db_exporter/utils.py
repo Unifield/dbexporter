@@ -4,6 +4,9 @@ import logging
 import os
 import datetime
 import sys
+import jinja2
+import psycopg2
+from psycopg2 import sql
 
 try:
     import config_local as cfg
@@ -94,14 +97,55 @@ def get_arguments(parser_type='basic'):
     return parser.parse_args()
 
 
+def get_list_of_columns(dbname: str, user: str, table_name: str,
+                        schema: str = None):
+
+    with psycopg2.connect(f"dbname={dbname} user={user}") as conn:
+        with conn.cursor as cur:
+            if schema:
+                query = sql.SQL("""
+                SELECT
+                    column_name 
+                FROM
+                    information_schema.columns
+                WHERE
+                    table_name = %s AND table_schema = %s
+                ORDER BY ordinal_position 
+                """)
+
+                cur.execute(query, (table_name, schema,))
+                rec = cur.fetchall()
+                columns = [r[0] for r in rec]
+                return columns
+
+
+def generate_select_statement(table_name: str,
+                              columns: list, schema: str = None):
+    try:
+        with open('select_template.sql') as f:
+            template = jinja2.Template(f.read())
+            rendered = template.render(
+                table=table_name,
+                columns=columns,
+                schema=schema
+                )
+        return rendered
+    except:
+        pass
+
+
 def prepare_psql_command(db_name, table_name, user, output_path, delimiter,
                          schema, pwd):
+
+    columns = get_list_of_columns(db_name, user, table_name, schema)
+    select_statement = generate_select_statement(table_name, columns, schema)
     output_path = f"{os.path.join(output_path, table_name)}.csv"
+
     if schema:
-        base_sql = f"\COPY {schema}.{table_name} TO '{output_path}' " \
+        base_sql = f"\COPY ({select_statement}) TO '{output_path}' " \
                    f"DELIMITER '{delimiter}' CSV HEADER;"
     else:
-        base_sql = f"\COPY {table_name} TO '{output_path}' " \
+        base_sql = f"\COPY ({select_statement}) TO '{output_path}' " \
                    f"DELIMITER '{delimiter}' CSV HEADER;"
 
     if pwd:
