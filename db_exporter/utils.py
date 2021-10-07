@@ -117,36 +117,49 @@ def get_list_of_columns(dbname: str, user: str, table_name: str,
                 rec = cur.fetchall()
                 columns = [r[0] for r in rec]
                 return columns
+            else:
+
+                query = sql.SQL("""
+                SELECT
+                    column_name 
+                FROM
+                    information_schema.columns
+                WHERE
+                    table_name = %s 
+                ORDER BY ordinal_position 
+                """)
+
+                cur.execute(query, (table_name,))
+                rec = cur.fetchall()
+                columns = [r[0] for r in rec]
+                return columns
 
 
 def generate_select_statement(table_name: str,
                               columns: list, schema: str = None):
-    try:
-        with open('db_exporter/select_template.sql') as f:
-            template = jinja2.Template(f.read())
-            rendered = template.render(
-                table=table_name,
-                columns=columns,
-                schema=schema
-                )
+    with open('db_exporter/select_template.sql') as f:
+        template = jinja2.Template(f.read())
+        rendered = template.render(
+            table=table_name,
+            columns=columns,
+            schema=schema
+            )
         return rendered
-    except:
-        pass
 
 
 def prepare_psql_command(db_name, table_name, user, output_path, delimiter,
                          schema, pwd):
 
     columns = get_list_of_columns(db_name, user, table_name, schema)
+    if not columns:
+        raise ValueError("Columns should not be empty list.")
+
     select_statement = generate_select_statement(table_name, columns, schema)
     output_path = f"{os.path.join(output_path, table_name)}.csv"
 
-    if schema:
-        base_sql = f"\COPY ({select_statement}) TO '{output_path}' " \
-                   f"DELIMITER '{delimiter}' CSV HEADER;"
-    else:
-        base_sql = f"\COPY ({select_statement}) TO '{output_path}' " \
-                   f"DELIMITER '{delimiter}' CSV HEADER;"
+    base_sql = f"\COPY ({select_statement}) TO '{output_path}' " \
+               f"DELIMITER '{delimiter}' CSV HEADER HEADER QUOTE '\"'" \
+               f"FORCE QUOTE *;"
 
     if pwd:
         command = f"PGPASSWORD={pwd} psql {user} -w -d " \
