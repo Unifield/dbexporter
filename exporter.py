@@ -1,5 +1,5 @@
-import lake_handler as lh
-import utils
+import db_exporter.lake_handler as lh
+import db_exporter.utils as utils
 import os
 import shutil
 import logging

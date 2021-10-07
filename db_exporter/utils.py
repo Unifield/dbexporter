@@ -101,7 +101,7 @@ def get_list_of_columns(dbname: str, user: str, table_name: str,
                         schema: str = None):
 
     with psycopg2.connect(f"dbname={dbname} user={user}") as conn:
-        with conn.cursor as cur:
+        with conn.cursor() as cur:
             if schema:
                 query = sql.SQL("""
                 SELECT
@@ -122,7 +122,7 @@ def get_list_of_columns(dbname: str, user: str, table_name: str,
 def generate_select_statement(table_name: str,
                               columns: list, schema: str = None):
     try:
-        with open('select_template.sql') as f:
+        with open('db_exporter/select_template.sql') as f:
             template = jinja2.Template(f.read())
             rendered = template.render(
                 table=table_name,
