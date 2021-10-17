@@ -73,9 +73,6 @@ if __name__ == '__main__':
     # Run export and upload
     output_files = asyncio.run(utils.main_export(cmds, args.num_workers))
 
-    for file in output_files:
-        utils.normalize_data(file)
-
     # Upload files
     for file in output_files:
         try:

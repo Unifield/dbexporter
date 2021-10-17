@@ -4,9 +4,7 @@ import logging
 import os
 import datetime
 import sys
-import subprocess
 import jinja2
-import pandas as pd
 import psycopg2
 from psycopg2 import sql
 
@@ -158,7 +156,7 @@ def prepare_psql_command(db_name, table_name, user, output_path, delimiter,
     select_statement = generate_select_statement(table_name, columns, schema)
     output_path = f"{os.path.join(output_path, table_name)}.csv"
 
-    base_sql = f"\COPY ({select_statement}) TO '{output_path}'" \
+    base_sql = f"\COPY ({select_statement}) TO '{output_path}' " \
                f"DELIMITER '{delimiter}' CSV HEADER QUOTE '\\\"' " \
                f"FORCE QUOTE *;"
 
@@ -169,19 +167,6 @@ def prepare_psql_command(db_name, table_name, user, output_path, delimiter,
         command = f"psql {user} -w -d " \
                   f"{db_name} -c \"{base_sql}\""
     return command, output_path
-
-
-def normalize_data(source_path):
-    tmp = source_path + '_tmp'
-    os.rename(source_path, tmp)
-    df = pd.read_csv(tmp,
-                     dtype=str)
-    df.to_csv(tmp,
-              line_terminator="\r", index=False)
-    process = subprocess.call(['sed', '-i', 's~\r$~~', tmp])
-    process = subprocess.call(f"tr '\n' ' ' < {tmp} > {source_path}",
-                              shell=True)
-    os.remove(tmp)
 
 
 async def export_csv(arg):
