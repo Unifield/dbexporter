@@ -75,7 +75,7 @@ if __name__ == '__main__':
                "DELIMITER '','' CSV HEADER QUOTE ''\\\"'' " \
                "FORCE QUOTE *;"
     t = 't_journal_item'
-    output_path = '/home/dbexporter_backup/dbexporter/output'
+    output_path = '/home/dbexporter/dbexporter/output'
     cmds.append((command, output_path, t))
 
     # Run export and upload
