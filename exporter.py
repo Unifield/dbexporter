@@ -80,8 +80,8 @@ if __name__ == '__main__':
 
     #adding only data for OCP
     command = "psql  dbexporter -w -d ufdb -c \"\COPY (SELECT proprietary_instance,	journal_code,	entry_sequence,	document_date,	book_currency,	functional_currency,	period,	posting_date,	reference,	third_parties from ufdb.t_journal_item WHERE oc = 'OCP') TO '/home/dbexporter/dbexporter/output/t_journal_item_OCP.csv'\" "\
-               \"DELIMITER '','' CSV HEADER QUOTE ''\\\"'' " \
-               \"FORCE QUOTE *;"
+               f"DELIMITER '','' CSV HEADER QUOTE ''\\\"'' " \
+               f"FORCE QUOTE *;"
     t = 't_journal_item_ocp'
     output_path = '/home/dbexporter/dbexporter/output/t_journal_item_OCP.csv'
     cmds.append((command, output_path, t))
