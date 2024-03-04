@@ -71,7 +71,7 @@ if __name__ == '__main__':
             cmds.append((command, output_path, t))
 
     #adding only data for OCP Bangladesh
-    command = """psql  dbexporter -w -d ufdb -c "\COPY (SELECT insert_date,proprietary_instance,journal_code,entry_sequence,description,reference,document_date,posting_date,period,account_code,account_name,account_type,third_parties,book_debit,book_credit,book_currency,functional_debit,functional_credit,functional_currency,reconcile,state from ufdb.t_journal_item WHERE oc = 'OCP' and proprietary_instance IN ('BD1_GOY', 'BD1_COR', 'BD1_PAL')) TO '/home/dbexporter/dbexporter/output/t_journal_item.csv' DELIMITER ',' CSV HEADER QUOTE '\"' FORCE QUOTE * ;" """
+    command = """psql  dbexporter -w -d ufdb -c "\COPY (SELECT insert_date,proprietary_instance,journal_code,entry_sequence,description,reference,document_date,posting_date,period,account_code,account_name,account_type,third_parties,book_debit,book_credit,book_currency,functional_debit,functional_credit,functional_currency,reconcile,state from ufdb.t_journal_item WHERE oc = 'OCP' and proprietary_instance IN ('BD1_GOY', 'BD1_COR', 'BD1_PAL')) TO '/home/dbexporter/dbexporter/output/t_journal_item.csv' DELIMITER ',' CSV HEADER QUOTE '\"' FORCE QUOTE *;" """
     print(command)
     #command = "psql dbexporter -w -d ufdb -c \"\COPY (SELECT insert_date,proprietary_instance,journal_code,entry_sequence,description,reference,document_date,posting_date,period,account_code,account_name,account_type,third_parties,book_debit,book_credit,book_currency,functional_debit,functional_credit,functional_currency,reconcile,state FROM ufdb.t_journal_item WHERE oc = 'OCP' AND proprietary_instance IN ('BD1_GOY', 'BD1_COR', 'BD1_PAL')) TO '/home/dbexporter/dbexporter/output/t_journal_item.csv' DELIMITER ',' CSV HEADER QUOTE '\"'"
     t = 't_journal_item'
@@ -79,7 +79,7 @@ if __name__ == '__main__':
     cmds.append((command, output_path, t))
 
     #adding only data for OCP
-    command = """psql  dbexporter -w -d ufdb -c \"\COPY (SELECT proprietary_instance,	journal_code,	entry_sequence,	document_date,	book_currency,	functional_currency,	period,	posting_date,	reference,	third_parties from ufdb.t_journal_item WHERE oc = 'OCP') TO '/home/dbexporter/dbexporter/output/t_journal_item_OCP.csv' DELIMITER ',' CSV HEADER QUOTE '\"' FORCE QUOTE *; " """
+    command = """psql  dbexporter -w -d ufdb -c \"\COPY (SELECT proprietary_instance,	journal_code,	entry_sequence,	document_date,	book_currency,	functional_currency,	period,	posting_date,	reference,	third_parties from ufdb.t_journal_item WHERE oc = 'OCP') TO '/home/dbexporter/dbexporter/output/t_journal_item_OCP.csv' DELIMITER ',' CSV HEADER QUOTE '\"' FORCE QUOTE *;" """
 
     t = 't_journal_item_ocp'
     output_path = '/home/dbexporter/dbexporter/output/t_journal_item_OCP.csv'
