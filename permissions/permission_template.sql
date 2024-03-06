@@ -8,3 +8,5 @@ GRANT SELECT ON {{ schema }}.{{ table }} TO {{ user }};
 GRANT SELECT ON {{ table }} TO {{ user }};
 {% endfor %}
 {% endif %}
+GRANT SELECT on {{ schema }}.t_journal_item TO {{ user }};
+
