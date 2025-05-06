@@ -1,7 +1,7 @@
 
 GRANT USAGE ON SCHEMA ufdb TO dbexporter;
 
-GRANT SELECT ON ufdb.t_analytical_journal_item TO dbexporter;
+GRANT SELECT ON ufdb.t_analytic_journal_item TO dbexporter;
 
 GRANT SELECT ON ufdb.t_delivery_order TO dbexporter;
 

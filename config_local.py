@@ -32,7 +32,7 @@ num_workers = 4  # number of async workers
 
 table_list = [
 
-    't_analytical_journal_item',
+    't_analytic_journal_item',
     
     't_delivery_order',
     
