@@ -1,7 +1,5 @@
-config_local.py
 logs
 output
 __pycache__
 *.pyc
 *.pyo
-permissions/generated_permissions.sql
