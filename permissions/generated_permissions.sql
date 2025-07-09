@@ -45,5 +45,7 @@ GRANT SELECT ON ufdb.t_supplier_catalogue TO dbexporter;
 
 GRANT SELECT ON ufdb.t_supplier_customer_document TO dbexporter;
 
+GRANT SELECT ON ufdb.t_unreserved_stock TO dbexporter;
+
 
 GRANT SELECT on ufdb.t_journal_item TO dbexporter;

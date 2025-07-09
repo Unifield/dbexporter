@@ -75,7 +75,9 @@ table_list = [
 
     't_supplier_catalogue',
 
-    't_supplier_customer_document'
+    't_supplier_customer_document',
+    
+    't_unreserved_stock'
 
 ]
 
