@@ -31,6 +31,7 @@ output_dir = "/home/dbexporter/dbexporter/output"
 num_workers = 4  # number of async workers
 
 table_list = [
+    't_analytic_account',
 
     't_analytic_journal_item',
     
